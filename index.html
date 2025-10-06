@@ -140,7 +140,7 @@ nav{display:flex;align-items:center;justify-content:center}
 .inquiry-grid{
   display:grid;
   gap:22px;
-  grid-template-columns:0.8fr 1.2fr; /* left smaller (location), right wider (form) */
+  grid-template-columns:1.2fr 0.8fr; /* left smaller (location), right wider (form) */
   align-items:start;
 }
 
@@ -364,17 +364,7 @@ nav{display:flex;align-items:center;justify-content:center}
     <p class="lead">Give us a few details and we’ll follow up with availability and options.</p>
 
     <div class="inquiry-grid">
-      <!-- LEFT: Our Location (image on top, text below) -->
-      <aside class="loc-card" aria-labelledby="locTitle">
-        <img src="https://segwik-account.s3.amazonaws.com/3719/make_wine_met_life_small.jpg" alt="Map to Make Wine With Us, near MetLife area in NJ">
-        <div class="loc-body">
-          <h3 id="locTitle">Make Wine With Us</h3>
-          <strong>21 Curie Ave, Wallington, New Jersey, 07057</strong>
-          <div class="loc-dir" style="margin-top:8px">
-            <a href="https://www.google.com/maps/dir/?api=1&destination=21+Curie+Ave,+Wallington,+NJ+07057" target="_blank" rel="noopener">Get Directions ↗</a>
-          </div>
-        </div>
-      </aside>
+
 
       <!-- RIGHT: Form -->
       <form class="form" action="/private-events" method="post">
@@ -432,6 +422,17 @@ nav{display:flex;align-items:center;justify-content:center}
           <button class="btn primary" type="submit">Submit</button>
         </div>
       </form>
+            <!-- LEFT: Our Location (image on top, text below) -->
+      <aside class="loc-card" aria-labelledby="locTitle">
+        <img src="https://segwik-account.s3.amazonaws.com/3719/make_wine_met_life_small.jpg" alt="Map to Make Wine With Us, near MetLife area in NJ">
+        <div class="loc-body">
+          <h3 id="locTitle">Make Wine With Us</h3>
+          <strong>21 Curie Ave, Wallington, New Jersey, 07057</strong>
+          <div class="loc-dir" style="margin-top:8px">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=21+Curie+Ave,+Wallington,+NJ+07057" target="_blank" rel="noopener">Get Directions ↗</a>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 </section>
