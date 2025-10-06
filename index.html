@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Private Events — Make Wine With Us</title>
+
+<!-- Fonts: Montserrat everywhere -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://d34hmiuaex7c0.cloudfront.net" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --brand:#800080;--brand-2:#9a329a;--gold:#e9cf7c;--ink:#0f172a;--muted:#6b7280;
+  --line:#e9e9ee;--bg:#ffffff;--radius:16px;--shadow-sm:0 8px 18px rgba(0,0,0,.06);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.12);--hdr-h:64px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  font-family:"Montserrat",system-ui,-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+  color:var(--ink);
+  background:var(--bg)
+}
+a{color:inherit;text-decoration:none}
+img,video{max-width:100%;display:block}
+.container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+/* Force full width for announcement/header/footer inner wrappers */
+#announce .container,
+#siteHeader .container,
+.site-footer .container{
+  max-width:none;width:100%;margin:0;padding-left:16px;padding-right:16px;
+}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;justify-content:center;height:42px;padding:0 16px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:15px;cursor:pointer;transition:transform .04s ease,box-shadow .2s ease,background .2s ease,filter .2s ease;user-select:none;position:relative;overflow:hidden;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fff;box-shadow:0 12px 28px rgba(128,0,128,.35)}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 18px 36px rgba(128,0,128,.45);filter:brightness(1.04)}
+
+/* Announcement (unchanged) */
+.announce-global{background:var(--brand);color:#fff;font-size:14px;line-height:1.35}
+.announce-inner{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 0}
+.announce-global a{color:#fff;text-decoration:underline}
+
+/* Header / nav (unchanged) */
+header{border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:100}
+.bar{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 24px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand img{height:56px;width:auto}
+nav{display:flex;align-items:center;justify-content:center}
+.nav{display:flex;list-style:none;margin:0;padding:0;font-size:16px;width:100%;justify-content:space-evenly;white-space:nowrap}
+.nav a{color:#374151;font-weight:700}
+.nav a:hover{color:var(--brand)}
+.has-sub{position:relative}
+.subnav{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border-radius:12px;box-shadow:0 14px 36px rgba(0,0,0,.12);padding:8px;display:none}
+.has-sub:hover .subnav,.has-sub:focus-within .subnav{display:block}
+.subnav a{display:block;padding:8px 10px;border-radius:8px}
+.subnav a:hover{background:#faf7fb;color:var(--brand)}
+.actions{display:flex;align-items:center;gap:12px}
+.phone{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;color:#111827}
+.phone svg{width:16px;height:16px}
+.social{display:flex;gap:8px}
+.social a{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.social a:hover{color:var(--brand)}
+.hamburger{display:none}
+#nav-toggle{display:none}
+@media (max-width:980px){
+  .bar{grid-template-columns:auto auto 1fr}
+  .brand img{height:48px}
+  .hamburger{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff}
+  nav{justify-content:flex-end}
+  .nav{position:fixed;inset:64px 16px auto 16px;flex-direction:column;gap:10px;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:14px;display:none}
+  #nav-toggle:checked ~ nav .nav{display:flex}
+  .subnav{position:static;box-shadow:none;padding:6px 0}
+}
+
+/* HERO – show full 1920x1080 video, left text, darker overlay + text-shadows */
+.hero{position:relative;background:#000;color:#fff;isolation:isolate}
+.hero-inner{
+  position:relative;width:100%;aspect-ratio:16/9; /* ensures the whole video fits */
+  display:flex;align-items:flex-end;justify-content:flex-start;
+}
+.hero video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000; /* show full frame */
+}
+.hero::before{ /* darken video globally */
+  content:"";position:absolute;inset:0;background:rgba(0,0,0,.35);pointer-events:none;z-index:1;
+}
+.hero::after{ /* subtle bottom gradient for extra contrast over controls area */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:28%;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 70%, rgba(0,0,0,.78) 100%);
+  pointer-events:none;z-index:1;
+}
+.hero-copy{
+  position:relative;z-index:2;width:100%;
+  padding:28px 0;
+}
+.hero-left{
+  max-width:720px; /* left-aligned like homepage */
+}
+.hero-eyebrow{font-weight:900;letter-spacing:.2px;margin:0 0 6px;font-size:14px;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.hero-title{margin:0 0 10px;font-size:clamp(34px,5.6vw,62px);line-height:1.06;font-weight:900;text-shadow:0 2px 14px rgba(0,0,0,.65)}
+.hero-desc{margin:0 0 16px;font-size:clamp(15px,2.1vw,19px);opacity:.98;max-width:72ch;text-shadow:0 1px 10px rgba(0,0,0,.55)}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+
+/* Section helpers */
+.section{padding:56px 0}
+.section.narrow{padding:44px 0}
+.section .title{font-size:clamp(26px,3.2vw,40px);margin:0 0 10px;font-weight:900}
+.section .lead{font-size:18px;color:#374151;margin:0 0 22px;max-width:75ch}
+
+/* Event Types grid */
+.types-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(6,1fr);
+}
+@media(max-width:1100px){.types-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:700px){.types-grid{grid-template-columns:repeat(2,1fr)}}
+.type-card{
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;
+  box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px;align-items:flex-start;transition:transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.type-card:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(0,0,0,.12);border-color:#dcd3ef}
+.type-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fff;flex:0 0 auto;
+}
+.type-name{font-weight:800}
+.type-note{font-size:14px;color:#6b7280}
+
+/* Two Ways to Host */
+.host-grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+@media(max-width:900px){.host-grid{grid-template-columns:1fr}}
+.host-card{
+  border:1px solid var(--line);border-radius:18px;background:#fff;padding:22px;box-shadow:var(--shadow-sm)
+}
+.host-card h3{margin:0 0 8px;font-size:22px}
+.host-list{margin:12px 0 0 0;padding:0 0 0 18px;color:#374151}
+.host-list li{margin:6px 0}
+
+/* Location section */
+.loc-wrap{display:grid;gap:16px;grid-template-columns:1.2fr 1fr;align-items:start}
+@media(max-width:980px){.loc-wrap{grid-template-columns:1fr}}
+.loc-map img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-sm)}
+
+/* Testimonials – horizontal scroll */
+.testiscroll{
+  display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.tcard{flex:0 0 340px;scroll-snap-align:start;border:1px solid var(--line);border-radius:18px;background:#fff;padding:18px;box-shadow:var(--shadow-sm)}
+@media(max-width:440px){.tcard{flex-basis:85%}}
+.tcard .stars{color:#f5b50a;margin-bottom:8px}
+.tcard .who{font-weight:800;margin-top:10px}
+
+/* Inquiry form */
+.form{
+  border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow-sm);padding:18px;
+}
+.form-grid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+@media(max-width:800px){.form-grid{grid-template-columns:1fr}}
+.input{display:flex;flex-direction:column;gap:6px}
+.input label{font-weight:700;font-size:14px}
+.input input,.input select,.input textarea{
+  height:42px;padding:10px 12px;border:1px solid #e6e6ef;border-radius:10px;font:inherit
+}
+.input textarea{height:120px;resize:vertical}
+.radio-row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+.radio-row label{display:flex;align-items:center;gap:8px;font-weight:700}
+.radio-row input{accent-color:#800080}
+
+/* Footer (unchanged) */
+.site-footer{background:#111;color:#ddd;font-size:15px;line-height:1.6;padding-top:50px}
+.footer-grid{display:grid;gap:40px;grid-template-columns:1.2fr 1fr 1fr}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.footer-grid{grid-template-columns:1fr}}
+.foot-title{color:#fff;font-weight:800;margin:0 0 12px;font-size:16px;text-transform:uppercase;position:relative}
+.foot-title::after{content:"";display:block;width:40px;height:2px;background:var(--brand);margin-top:6px}
+.footer-text{margin-bottom:14px;max-width:500px;color:#ccc}
+.footer-cta{margin-top:6px;display:inline-block;font-size:14px;padding:8px 18px}
+.footer-social{margin-top:16px;display:flex;gap:12px}
+.footer-social a{width:34px;height:34px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:15px}
+.footer-social a:hover{background:var(--brand);color:#fff}
+.foot-links{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.foot-links a{color:#ddd;font-weight:500}
+.foot-links a:hover{color:#fff}
+.contact-list{list-style:none;padding:0;margin:0 0 14px;display:flex;flex-direction:column;gap:10px}
+.contact-list i{margin-right:8px;color:#fff}
+.contact-list a{color:#ddd}
+.contact-list a:hover{color:#fff}
+.hours-label{display:block;font-size:13px;color:#aaa;margin-bottom:2px;text-transform:uppercase}
+.hours-value{color:#eee}
+.footer-bottom{border-top:1px solid #222;margin-top:40px;padding:18px 0;font-size:13px;color:#999}
+.footer-bottom-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.footer-bottom a{color:#999;margin-left:14px}
+.footer-bottom a:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<!-- One-liner announcement (unchanged) -->
+<div class="announce-global" id="announce">
+  <div class="container announce-inner">
+    <div>🏅 Our winemakers clinched <strong>Best Red</strong> at the 2025 Garden State Amateur Wine Challenge — congratulations!</div>
+    <div><a href="https://makewinewithus.com/login">Already have an account? Log in</a></div>
+  </div>
+</div>
+
+<!-- Header (unchanged) -->
+<header id="siteHeader">
+  <div class="container bar">
+    <a class="brand" href="https://makewinewithus.com" aria-label="Make Wine With Us — Home">
+      <img src="https://d34hmiuaex7c0.cloudfront.net/3719/uploads/cmaspages/gallery/1672135833219.png" alt="Make Wine With Us logo"/>
+    </a>
+
+    <label class="hamburger" for="nav-toggle">☰ Menu</label>
+    <input id="nav-toggle" type="checkbox"/>
+
+    <nav aria-label="Primary">
+      <ul class="nav">
+        <li class="has-sub">
+          <a href="https://makewinewithus.com/winemaking-process">Winemaking Process</a>
+          <div class="subnav" role="menu">
+            <a href="https://makewinewithus.com/new-product-list" role="menuitem">Wines You Can Make</a>
+            <a href="https://makewinewithus.com/design-your-custom-bottle" role="menuitem">Label Making</a>
+          </div>
+        </li>
+        <li><a href="https://makewinewithus.com/region">Regions</a></li>
+        <li><a href="https://makewinewithus.com/about">About</a></li>
+        <li><a href="https://makewinewithus.com/faq-s">FAQs</a></li>
+        <li class="has-sub">
+          <a href="https://makewinewithus.com/upcoming-events">Events</a>
+          <div class="subnav" role="menu">
+            <a href="https://makewinewithus.com/private-events" role="menuitem">Private Events</a>
+            <a href="https://makewinewithus.com/upcoming-events" role="menuitem">Upcoming Events</a>
+          </div>
+        </li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a class="phone" href="tel:+12018769463" aria-label="Call Make Wine With Us">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3.09 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.9.31 1.77.57 2.6a2 2 0 0 1-.45 2.11L9 10a16 16 0 0 0 5 5l.57-.57a2 2 0 0 1 2.11-.45c.83.26 1.7.45 2.6.57A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        (201) 876-9463
+      </a>
+
+      <div class="social">
+        <a href="https://www.facebook.com/MakeWineWithUs" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/makewinewithus/" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+
+      <a class="btn primary" href="https://makewinewithus.com/create-account">Make Wine Now</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO WITH VIDEO (full 16:9 visible) -->
+<section class="hero" aria-label="Private Events Hero">
+  <div class="hero-inner">
+    <video id="heroVideo" playsinline muted autoplay loop preload="auto"
+      src="https://d34hmiuaex7c0.cloudfront.net/3719/uploads/cmaspages/gallery/galleryitem_1759774460076.mp4">
+    </video>
+
+    <div class="hero-copy">
+      <div class="container">
+        <div class="hero-left">
+          <div class="hero-eyebrow">PRIVATE EVENTS AT MAKE WINE WITH US</div>
+          <h1 class="hero-title">Turn Celebrations Into Unforgettable Experiences</h1>
+          <p class="hero-desc">From birthdays and showers to corporate team-building, our working winery transforms any gathering into a hands-on, memory-making night—surrounded by barrels, aromas, and great people.</p>
+          <div class="hero-ctas">
+            <a class="btn primary" href="#inquiry">Book Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT TYPES (exact list) -->
+<section class="section" id="types">
+  <div class="container">
+    <h2 class="title">Choose Your Kind of Celebration</h2>
+    <p class="lead">Pick the vibe—we’ll tailor the space, flow, and touches to match. Keep it simple or go all-out.</p>
+
+    <div class="types-grid">
+      <!-- Birthday Parties -->
+      <article class="type-card">
+        <div class="type-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3v4M9 7h6M4 10h16v9H4z"/>
+            <path d="M4 14c1.5 0 1.5 2 3 2s1.5-2 3-2 1.5 2 3 2 1.5-2 3-2 1.5 2 3 2"/>
+          </svg>
+        </div>
+        <div class="type-name">Birthday Parties</div>
+        <div class="type-note">Milestone or just because—toast with your people.</div>
+      </article>
+
+      <!-- Bridal Showers -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="14" r="6"></circle><path d="M9 7l3-3 3 3"></path>
+          </svg>
+        </div>
+        <div class="type-name">Bridal Showers</div>
+        <div class="type-note">Elegant, cozy, and totally photogenic.</div>
+      </article>
+
+      <!-- Bachelor Parties -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 4l5 2 4-2 5 2-2 7a6 6 0 01-10 0L5 4z"/>
+            <path d="M7 20h10"></path>
+          </svg>
+        </div>
+        <div class="type-name">Bachelor Parties</div>
+        <div class="type-note">Festive, fun, and surprisingly classy.</div>
+      </article>
+
+
+      <!-- Corporate Team Building -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16v10H4z"></path><path d="M9 7V5h6v2"></path>
+          </svg>
+        </div>
+        <div class="type-name">Corporate Team Building</div>
+        <div class="type-note">Break silos while blending a house cuvée.</div>
+      </article>
+
+      <!-- Engagement Parties -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21s-6-4.35-6-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.65-6 9-6 9z"/>
+          </svg>
+        </div>
+        <div class="type-name">Engagement Parties</div>
+        <div class="type-note">Warm, candle-lit, and barrel-room chic.</div>
+      </article>
+
+      <!-- Holiday Parties -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"/>
+          </svg>
+        </div>
+        <div class="type-name">Holiday Parties</div>
+        <div class="type-note">Seasonal menus and twinkle-light vibes.</div>
+      </article>
+
+      <!-- Wedding Receptions -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 7l5 5 5-5"></path><path d="M12 12v7"></path>
+          </svg>
+        </div>
+        <div class="type-name">Wedding Receptions</div>
+        <div class="type-note">Romantic winery ambiance for your celebration.</div>
+      </article>
+
+      <!-- Graduations -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3l9 5-9 5-9-5 9-5z"/>
+            <path d="M7 12v5a5 5 0 0010 0v-5"/>
+          </svg>
+        </div>
+        <div class="type-name">Graduations</div>
+        <div class="type-note">Raise a glass to what’s next.</div>
+      </article>
+
+      <!-- Family Reunions -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="8" r="3"/><circle cx="17" cy="8" r="3"/>
+            <path d="M2 21a7 7 0 0114 0M10 21a7 7 0 0112 0"/>
+          </svg>
+        </div>
+        <div class="type-name">Family Reunions</div>
+        <div class="type-note">Laugh loud. Stay late. Make memories.</div>
+      </article>
+
+      <!-- Anniversaries -->
+      <article class="type-card">
+        <div class="type-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12c0 1.657-1.79 3-4 3s-4-1.343-4-3 1.79-3 4-3 4 1.343 4 3zm6 0c0 1.657 1.79 3 4 3s4-1.343 4-3-1.79-3-4-3-4 1.343-4 3z"/>
+            <path d="M9 12h6"/>
+          </svg>
+        </div>
+        <div class="type-name">Anniversaries</div>
+        <div class="type-note">The perfect place to say “still us.”</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- TWO WAYS TO HOST (single CTA = Book Now) -->
+<section class="section" id="hosting">
+  <div class="container">
+    <h2 class="title">Two Ways to Host</h2>
+    <p class="lead">Bring your own food and décor—or let us handle everything. Either way, you get the MWwU magic.</p>
+
+    <div class="host-grid">
+      <div class="host-card">
+        <h3>Bring-Your-Own (BYO) Style</h3>
+        <p>Perfect if you already have a favorite caterer or you want a potluck feel.</p>
+        <ul class="host-list">
+          <li>Use of our winery event space</li>
+          <li>Tables, chairs, and basic setup included</li>
+          <li>Playlist over house audio</li>
+          <li>Staff on site for support</li>
+        </ul>
+        <div style="margin-top:14px">
+          <a class="btn primary" href="#inquiry">Book Now</a>
+        </div>
+      </div>
+
+      <div class="host-card">
+        <h3>Full-Service Experience</h3>
+        <p>Arrive and enjoy—we coordinate food, timeline, and premium touches.</p>
+        <ul class="host-list">
+          <li>Curated catering & table settings</li>
+          <li>Winery-led welcome & photo-ready moments</li>
+          <li>Planning support & run-of-show</li>
+          <li>Optional hands-on winemaking demo</li>
+        </ul>
+        <div style="margin-top:14px">
+          <a class="btn primary" href="#inquiry">Book Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION (replaces Venue Highlights) -->
+<section class="section narrow" id="location">
+  <div class="container">
+    <h2 class="title">Our Location</h2>
+    <div class="loc-wrap">
+      <div class="loc-map">
+        <a href="https://www.google.com/maps/place/21+Curie+Ave,+Wallington,+NJ+07057" target="_blank" rel="noopener">
+          <img src="https://segwik-account.s3.amazonaws.com/3719/make_wine_met_life_small.jpg" alt="Map to Make Wine With Us, near MetLife area in NJ">
+        </a>
+      </div>
+      <div>
+        <p class="lead" style="margin-top:0">Visit us in the heart of Northern New Jersey—easy to reach for you and your guests.</p>
+        <strong>21 Curie Ave, Wallington, New Jersey, 07057</strong>
+        <div style="margin-top:10px">
+          <a class="btn primary" href="https://www.google.com/maps/dir/?api=1&destination=21+Curie+Ave,+Wallington,+NJ+07057" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (horizontal scroll) -->
+<section class="section narrow" id="love">
+  <div class="container">
+    <h2 class="title">People Love Events Here</h2>
+    <div class="testiscroll">
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“Very nice staff, they can't do enough to help you. Thanks Matt! Streamlined process & hopefully good wine. This is our second year back here & I'm sure we'll be there next year too.”</p>
+        <div class="who">— Terry Taddeo</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“The ultimate spot in Northern New Jersey where you will learn the ancient and fine art of wine🍷making in a friendly, clean & knowledgable environment!!! The Gizzi family and professional staff truly treat you like family and not just another customer!!!”</p>
+        <div class="who">— John Migliaccio</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“We had a family reunion there.  Great place to enjoy wine and conversation.  Recommend going to ‘Make Wine With Us’. It is such a fun place.”</p>
+        <div class="who">— Carol Martucci</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“Great venue!!! Had a lot of fun performing there!!! Great place to make wine and the atmosphere is amazing!!! Can't wait to go back!”</p>
+        <div class="who">— Greg Kritikos</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“I had my 30th birthday party here and it was a really nice treat! Sue and Gus made things really seamless and pleasant! ... personalized labels for my birthday and each person got to foil and label their own wine bottle as a take home party favor! ... We were allowed to bring our own cake and had the whole place to ourselves. It was a great time!”</p>
+        <div class="who">— Sejal D.</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“Love it... Great place to set a memory... Very nice and helpful group. Love the job that they do with our wine. I will come back again..”</p>
+        <div class="who">— German T.</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p style="margin:0;color:#374151">“We had a great time...We actually rented a car service to come from Long Island..We had a ton of laughs, wonderful wine and dining experience..Four girlfriends went but we came home with 1000 stories and new friends...”</p>
+        <div class="who">— Christy R.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INQUIRY FORM -->
+<section class="section" id="inquiry">
+  <div class="container">
+    <h2 class="title">Tell Us About Your Event</h2>
+    <p class="lead">Give us a few details and we’ll follow up with availability and options.</p>
+
+    <form class="form" action="/private-events" method="post">
+      <!-- Hosting style first (radio) -->
+      <div class="radio-row" role="group" aria-labelledby="hoststyle-label">
+        <span id="hoststyle-label" class="sr-only"></span>
+        <label><input type="radio" name="hosting_style" value="BYO" required> Bring-Your-Own (BYO) Style</label>
+        <label><input type="radio" name="hosting_style" value="Full-Service" required> Full-Service Experience</label>
+      </div>
+
+      <div class="form-grid">
+        <div class="input">
+          <label for="name">Full Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" required>
+        </div>
+        <div class="input">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required>
+        </div>
+        <div class="input">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="(###) ###-####" required>
+        </div>
+        <div class="input">
+          <label for="type">Event Type</label>
+          <select id="type" name="type">
+            <option>Birthday Party</option>
+            <option>Bridal Shower</option>
+            <option>Bachelor Party</option>
+            <option>Trulli</option>
+            <option>Corporate Team Building</option>
+            <option>Engagement Party</option>
+            <option>Holiday Party</option>
+            <option>Wedding Reception</option>
+            <option>Graduation</option>
+            <option>Family Reunion</option>
+            <option>Anniversary</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="input">
+          <label for="date">Target Date</label>
+          <input id="date" name="date" type="date">
+        </div>
+        <div class="input">
+          <label for="guests">Guest Count (approx.)</label>
+          <input id="guests" name="guests" type="number" min="1" placeholder="e.g., 40">
+        </div>
+        <div class="input" style="grid-column:1/-1">
+          <label for="notes">Anything else we should know?</label>
+          <textarea id="notes" name="notes" placeholder="Menu ideas, décor preferences, timing, etc."></textarea>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <button class="btn primary" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Footer (unchanged) -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h3 class="foot-title">About Make Wine With Us</h3>
+      <p class="footer-text">Enjoy a unique winmaking experience - craft your own wine from premium grapes with guidance from our expert staff. Aged to perfection over a 9-month period, your wine is then bottled by you and taken home to savor and share.</p>
+      <a href="https://makewinewithus.com/create-account" class="btn primary footer-cta">Become a Winemaker</a>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/makewinewithus/" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.facebook.com/MakeWineWithUs" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="foot-title">Explore</h3>
+      <ul class="foot-links">
+        <li><a href="https://makewinewithus.com/about">About</a></li><li><a href="https://makewinewithus.com/winemaking-process">Winemaking Process</a></li>
+        <li><a href="https://makewinewithus.com/new-product-list">Wines You Can Make</a></li><li><a href="https://makewinewithus.com/region">Regions</a></li>
+        <li><a href="https://makewinewithus.com/blog">Blog</a></li><li><a href="https://makewinewithus.com/faq-s">FAQs</a></li>
+        <li><a href="https://makewinewithus.com/upcoming-events">Events</a></li><li><a href="https://makewinewithus.com/private-events">Private Events</a></li>
+        <li><a href="https://makewinewithus.com/contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="foot-title">Have a Question?</h3>
+      <ul class="contact-list">
+        <li><i class="fas fa-map-marker-alt"></i>21 Curie Avenue, Wallington, NJ 07057</li>
+        <li><i class="fas fa-phone-alt"></i><a href="tel:+12018769463">(201) 876-9463</a></li>
+        <li><i class="fas fa-envelope"></i><a href="mailto:info@makewinewithus.com">info@makewinewithus.com</a></li>
+      </ul>
+      <div class="hours"><span class="hours-label">Hours</span> <span class="hours-value">Closed today</span></div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>© 2025 Make Wine With Us. All rights reserved.</p>
+      <div class="foot-legal">
+        <a href="https://makewinewithus.com/privacy-policy">Privacy</a>
+        <a href="https://makewinewithus.com/terms-of-service">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Keep header height var (unchanged)
+  function setHeaderVar(){
+    const hdr=document.getElementById('siteHeader');
+    const hdrH=hdr?hdr.offsetHeight:0;
+    document.documentElement.style.setProperty('--hdr-h',hdrH+'px');
+  }
+  setHeaderVar();
+  window.addEventListener('resize', setHeaderVar);
+
+  // Button ripple
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('.btn'); if(!t) return;
+    const r=document.createElement('span'), rect=t.getBoundingClientRect();
+    Object.assign(r.style,{
+      position:'absolute', left:(e.clientX-rect.left)+'px', top:(e.clientY-rect.top)+'px',
+      width:'6px', height:'6px', borderRadius:'50%', background:'rgba(255,255,255,.5)',
+      transform:'translate(-50%,-50%) scale(0)', pointerEvents:'none',
+      transition:'transform .6s ease, opacity .8s ease'
+    });
+    t.appendChild(r);
+    requestAnimationFrame(()=>{ r.style.transform='translate(-50%,-50%) scale(18)'; r.style.opacity='0'; });
+    setTimeout(()=>r.remove(),800);
+  });
+
+  // Ensure hero video autoplays inline (no controls)
+  const hv=document.getElementById('heroVideo');
+  if(hv){
+    const tryPlay=()=>hv.play().catch(()=>{ /* autoplay guard */ });
+    if(hv.readyState>=2){ tryPlay(); } else { hv.addEventListener('loadeddata', tryPlay, {once:true}); }
+    hv.setAttribute('playsinline','');
+    hv.setAttribute('muted','');
+    hv.muted=true;
+    hv.loop=true;
+  }
+
+  /* Footer "Hours" text (unchanged logic, local schedule stub) */
+  (function(){
+    const tz='America/New_York';
+    const schedule=[null,null,{open:[13,0],close:[17,0]},{open:[13,0],close:[18,0]},{open:[13,0],close:[18,0]},{open:[13,0],close:[18,0]},null];
+    const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    function getParts(d){
+      const parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d);
+      const map={}; for(const p of parts) map[p.type]=p.value;
+      const dayIdx=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(map.weekday);
+      return {dayIdx,hour:parseInt(map.hour,10),minute:parseInt(map.minute,10)};
+    }
+    function fmtTime([h,m]){ const ampm=h>=12?'PM':'AM'; const h12=((h+11)%12)+1; const mm=String(m).padStart(2,'0'); return `${h12}:${mm} ${ampm}`; }
+    function nextOpenFrom(idx){ for(let i=1;i<=7;i++){ const n=(idx+i)%7; if(schedule[n]) return {dayIdx:n,opening:schedule[n].open}; } return null; }
+    const nowParts=getParts(new Date());
+    const tgt=document.querySelector('.hours .hours-value'); if(!tgt) return;
+    const today=schedule[nowParts.dayIdx];
+    if(!today){ tgt.textContent='Closed today'; return; }
+    const nowMin=nowParts.hour*60+nowParts.minute;
+    const openMin=today.open[0]*60+today.open[1];
+    const closeMin=today.close[0]*60+today.close[1];
+    if(nowMin<openMin){
+      tgt.textContent=`Closed · Opens at ${fmtTime(today.open)}`;
+    }else if(nowMin>=openMin && nowMin<closeMin){
+      tgt.textContent=`Open now · Closes at ${fmtTime(today.close)}`;
+    }else{
+      const next=nextOpenFrom(nowParts.dayIdx);
+      if(next){
+        const tomorrowIdx=(nowParts.dayIdx+1)%7;
+        tgt.textContent=next.dayIdx===tomorrowIdx ? `Closed · Opens tomorrow at ${fmtTime(next.opening)}` : `Closed · Opens ${dayNames[next.dayIdx]} at ${fmtTime(next.opening)}`;
+      }else{
+        tgt.textContent='Closed today';
+      }
+    }
+  }());
+})();
+</script>
+</body>
+</html>
